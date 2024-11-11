@@ -1,0 +1,103 @@
+1. Overview
+The Voting System is a simple RESTful API designed to handle the registration of candidates, casting votes, counting votes, listing all votes, and determining the winner. The system uses Spring Boot to build a web-based API that can be accessed by multiple users simultaneously. The architecture follows the principles of REST and ensures that all actions (such as entering a candidate, casting votes, etc.) are stateless and scalable.
+
+2. High-Level Architecture
+The architecture of the Voting System consists of the following main components:
+
+Client (User Interaction):
+The client interacts with the REST API through HTTP requests. The client can be a web browser, a mobile app, or a command-line tool (like curl).
+Spring Boot Application:
+The Spring Boot application hosts the REST API and business logic.
+It uses the embedded Tomcat server to handle incoming requests and responses.
+REST API:
+The API follows REST principles and exposes several endpoints:
+/entercandidate: Registers a new candidate.
+/castvote: Allows a user to vote for an existing candidate.
+/countvote: Returns the current vote count for a candidate.
+/listvote: Lists all registered candidates with their vote counts.
+/getwinner: Determines and returns the candidate with the highest vote count.
+Data Store (In-Memory):
+The system uses an in-memory data store (ConcurrentHashMap) to keep track of candidates and their vote counts. The system does not persist data to an external database, and all data is lost once the application is stopped.
+
+3. Design Principles
+The system follows the following design principles:
+
+Separation of Concerns:
+
+The controller class handles all API logic.
+The voting data is stored separately in a thread-safe ConcurrentHashMap, ensuring that the application can handle multiple concurrent users.
+Statelessness:
+
+The application does not rely on sessions or cookies. Each request is self-contained and independent.
+Thread Safety:
+
+The use of ConcurrentHashMap ensures thread-safe operations for concurrent requests, preventing race conditions during voting and candidate registration.
+Scalability:
+
+The design ensures that the application can handle a large number of users and votes simultaneously by making use of Spring Boot’s built-in concurrency and thread safety features.
+
+4. Components and Flow
+VotingController.java:
+
+The core of the application, containing all the API endpoints.
+EnterCandidate: Registers a new candidate and initializes their vote count to 0. It ensures that no duplicate candidates are added.
+CastVote: Allows users to vote for a candidate. The candidate's vote count is incremented by 1.
+CountVote: Fetches the current vote count for a specific candidate.
+ListVote: Lists all candidates along with their respective vote counts in JSON format.
+GetWinner: Returns the candidate with the highest number of votes.
+VotingApplication.java:
+
+The entry point for the Spring Boot application.
+It contains the main method to start the Spring Boot application, which launches the embedded Tomcat server and runs the web service.
+CandidateVotes.java:
+
+A helper class that holds the name of a candidate and their corresponding vote count.
+It is used in the /listvote endpoint to return a list of candidates and their votes.
+VotingControllerTest.java:
+
+Unit tests to ensure the proper functioning of the REST API.
+The tests validate the key operations such as candidate registration, vote casting, vote counting, and retrieving the winner.
+5. API Endpoints
+The system exposes the following RESTful API endpoints:
+
+POST /entercandidate:
+
+Registers a new candidate. Requires the name parameter.
+If the candidate already exists, it returns a 400 error.
+POST /castvote:
+
+Casts a vote for a registered candidate. Requires the name parameter.
+If the candidate does not exist, it returns a 400 error.
+GET /countvote:
+
+Returns the current vote count for a candidate. Requires the name parameter.
+If the candidate does not exist, it returns a 400 error.
+GET /listvote:
+
+Lists all candidates and their vote counts in JSON format.
+GET /getwinner:
+
+Returns the candidate with the highest number of votes.
+
+6. Data Model
+The data model is kept simple and consists of the following components:
+
+Candidate:
+Name: A unique identifier for the candidate (case-insensitive).
+Votes: The number of votes the candidate has received.
+The system uses an in-memory ConcurrentHashMap<String, Integer> where the key is the candidate name, and the value is their vote count. This structure supports thread-safe, efficient data access.
+
+7. Concurrency
+The application is designed to handle multiple concurrent users using the ConcurrentHashMap. This ensures that multiple users can simultaneously:
+
+Register candidates.
+Cast votes.
+Fetch vote counts without interference or data corruption.
+
+8. Unit Testing
+Unit tests have been written using Spring’s MockMvc to ensure the APIs work correctly. These tests cover:
+
+Registering candidates.
+Casting votes.
+Handling invalid candidate names.
+Listing all votes and determining the winner.
