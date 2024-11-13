@@ -1,4 +1,4 @@
-# **Voting System REST API**
+# **Voting System Using REST API**
 
 ## **Features Implemented**
 
@@ -107,7 +107,7 @@ mvn test
 
 
 
-## **Error Handling
+## **Error Handling**
 All endpoints return appropriate HTTP status codes:
 400 Bad Request for invalid inputs (e.g., invalid candidate name, empty name).
 200 OK for successful operations.
